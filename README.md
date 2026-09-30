@@ -55,9 +55,14 @@ The Zod source that was inspected came from the Zod dependency available in the 
 
 ### A3 — Planted Bug
 
-**Status: Pending.**
+**Status: Complete.**
 
-This stage requires pseudocoding the actual and intended behaviour of a function containing a planted bug, then identifying the difference between the two. No Part A3 content exists in this repository yet.
+- `part-a/a3-planted-bug.js` — the function under analysis, `calculateOrderTotal(items, discountPercent)`, which contains a planted bug
+- `part-a/a3-planted-bug-analysis.md` — pseudocode of what the implementation actually does and what it should do, two hand traces, the identified difference, and the proposed fix
+
+Both pseudocode specifications follow the repository standard, so the difference between them is reduced to the numbered steps. The trace without a discount matched the intended result. The trace with a discount produced 50 where the intended result was 200, and that difference is the planted bug: the discount branch replaces the subtotal with the discount amount instead of subtracting the discount from it.
+
+`part-a/a3-planted-bug.js` is left unmodified, so the traced evidence still corresponds to the code as analysed.
 
 ## Part B — Implementing From Pseudocode
 
@@ -105,9 +110,11 @@ The comparison also exposed additional validation questions that both implementa
 
 ### C4 — Explain Without Code
 
-**Status: Pending.**
+**Status: Complete.**
 
-This stage will contain a short recording where I explain the AI implementation using only my pseudocode notes, followed by what a non-technical listener understood from the explanation. No Part C4 content exists in this repository yet.
+`part-c/c4-explanation.md` contains the evidence for this stage: the recording link (linked from inside the document), what I explained using only my pseudocode notes, and what a non-technical listener understood when she explained the feature back to me in her own words.
+
+The recording runs approximately 7 minutes 30 seconds. That is over the five-minute maximum, and the overrun is recorded in the document rather than trimmed: the explanation continued into follow-up discussion and listener feedback.
 
 ## Running the Executable Checks
 
@@ -143,8 +150,7 @@ And reading Zod's `visit` function showed how much a short high-level descriptio
 
 ## Remaining Work
 
-- A3 planted-bug exercise
-- C4 recording and listener explanation
+None. Every stage in Parts A, B and C is complete and the evidence is committed.
 
 ## Repository Structure
 
@@ -155,7 +161,9 @@ pseudocoding-task/
 │   ├── pseudocode.md                          A1: three functions pseudocoded, traced, compared
 │   ├── a2-1-zod-isPlainObject.md              A2: isPlainObject analysis and comparison
 │   ├── a2-2-zod-getParsedType.md              A2: getParsedType analysis and comparison
-│   └── a2-3-zod-visit.md                      A2: visit analysis and comparison
+│   ├── a2-3-zod-visit.md                      A2: visit analysis and comparison
+│   ├── a3-planted-bug.js                      A3: function under analysis (unmodified)
+│   └── a3-planted-bug-analysis.md             A3: actual vs intended pseudocode, traces, planted bug
 ├── part-b/
 │   ├── coupon-pseudocode.md                   B1: applyCoupon spec and five hand traces
 │   ├── applyCoupon.js                         B2: my implementation
@@ -167,5 +175,5 @@ pseudocoding-task/
     ├── c2-difference-table.md                 C2: original vs reverse-engineered spec comparison
     ├── c3-comparison.test.js                  C3: executable 10-input comparison harness
     ├── c3-comparison.md                       C3: results and analysis
-    └── c4-explanation.md                      C4: recording and listener evidence (pending)
+    └── c4-explanation.md                      C4: recording link and listener evidence
 ```

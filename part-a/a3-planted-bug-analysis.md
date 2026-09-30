@@ -17,21 +17,138 @@ The function should:
 
 ## My Pseudocode of the Actual Implementation
 
-START
+This is what the code in `part-a/a3-planted-bug.js` actually does, described before looking for anything wrong with it.
 
-SET subtotal to 0
+FUNCTION calculateOrderTotal
 
-FOR EACH item in items
-    ADD (item.price × item.quantity) to subtotal
-END FOR
+INPUTS:
+- items (a list of order items, in the shape `{ price, quantity }`, where price is the
+  price of one unit of the item and quantity is how many units of it were ordered).
+  The list and its items are read but never changed.
+- discountPercent (an optional number, the discount to apply as a percentage, so 20 means
+  20% off). It is optional in the sense that a caller may leave it out; the function never
+  checks whether it was supplied.
 
-IF discountPercent is greater than 0
-    SET subtotal to subtotal × (discountPercent ÷ 100)
-END IF
+OUTPUT:
+- A number, the order total rounded to two decimal places. This is meant to be the amount
+  the customer should pay, but when a discount greater than zero is supplied it is the
+  value of the discount instead.
 
-SET subtotal to ROUND(subtotal × 100) ÷ 100
+SIDE EFFECTS:
+- NONE. The function does not modify the items list or any item, does not modify the
+  discount percentage, prints nothing, and makes no external calls. The only value it
+  changes is its own local subtotal variable.
 
-RETURN subtotal
+FAILS WHEN:
+- It fails to produce the amount the customer should pay whenever the discount percentage
+  is greater than zero. It replaces the subtotal with the discount amount instead of
+  removing the discount from it, so it returns the wrong value for every discounted order.
+  This is the planted bug.
+- It never checks its inputs. If the items list is missing or is not a list, the loop
+  cannot start and the function throws. If an item's price or quantity is missing or is
+  not a number, the arithmetic produces a value that is not a money amount, and that
+  value is returned as though it were valid.
+
+STEPS:
+
+1. Start a running subtotal at zero.
+
+2. Take each item from the items list, one at a time, in the order the list gives them.
+
+3. Multiply that item's price by that item's quantity to get the item's line total.
+
+4. Add that line total to the running subtotal.
+
+5. Repeat steps 3 and 4 until every item has been processed. The running subtotal now
+   holds the full cost of the order before any discount.
+
+6. If the discount percentage is greater than zero, take the discount branch: divide the
+   discount percentage by 100 to express it as a decimal fraction.
+
+7. Multiply the running subtotal by that decimal fraction.
+
+8. Replace the running subtotal with the result of that multiplication. This step keeps the
+   discount fraction of the subtotal rather than removing the discount from it.
+
+9. If the discount percentage is zero or less, skip steps 6 to 8 and leave the running
+   subtotal as the sum of the line totals.
+
+10. Multiply the running subtotal by 100.
+
+11. Round that value to the nearest whole number.
+
+12. Divide by 100 to put the value back to two decimal places.
+
+13. Return that rounded amount.
+
+END
+
+## My Pseudocode of the Intended Implementation
+
+This is what the same function should do, so the two specifications can be compared step
+by step. The only intentional difference is step 8.
+
+FUNCTION calculateOrderTotal
+
+INPUTS:
+- items (a list of order items, in the shape `{ price, quantity }`, where price is a
+  number giving the price of one unit of the item and quantity is a number giving how many
+  units of it were ordered). The list and its items are read but never changed.
+- discountPercent (an optional number, the discount to apply as a percentage, so 20 means
+  20% off). When it is not supplied, or is zero or less, no discount is applied.
+
+OUTPUT:
+- A number, the amount the customer should pay, rounded to two decimal places.
+
+SIDE EFFECTS:
+- NONE. The function does not modify the items list or any item, does not modify the
+  discount percentage, prints nothing, and makes no external calls. The only value it
+  changes is its own local subtotal variable.
+
+FAILS WHEN:
+- It never checks its inputs. If the items list is missing or is not a list, the loop
+  cannot start and the function throws. If an item's price or quantity is missing or is
+  not a number, the arithmetic produces a value that is not a money amount, and that
+  value is returned as though it were valid.
+- On the discount path it is not expected to fail at all: the discount is removed from the
+  subtotal and the discounted total is returned. Failing to do this is the planted bug in
+  the actual implementation.
+
+STEPS:
+
+1. Start a running subtotal at zero.
+
+2. Take each item from the items list, one at a time, in the order the list gives them.
+
+3. Multiply that item's price by that item's quantity to get the item's line total.
+
+4. Add that line total to the running subtotal.
+
+5. Repeat steps 3 and 4 until every item has been processed. The running subtotal now
+   holds the full cost of the order before any discount.
+
+6. If the discount percentage is greater than zero, work out the discount amount: divide
+   the discount percentage by 100 to express it as a decimal fraction, then multiply the
+   running subtotal by that fraction. The result is the amount to take off, not the amount
+   to keep.
+
+7. Subtract that discount amount from the running subtotal, so the subtotal now holds the
+   amount the customer still has to pay.
+
+8. Alternatively, and equivalently, work out the fraction that remains after the discount
+   — one minus the discount fraction — and multiply the running subtotal by that remaining
+   fraction instead of subtracting.
+
+9. If the discount percentage is zero or less, skip steps 6 to 8 and leave the running
+   subtotal as the full cost of the order.
+
+10. Multiply the running subtotal by 100.
+
+11. Round that value to the nearest whole number.
+
+12. Divide by 100 to put the value back to two decimal places.
+
+13. Return that rounded amount.
 
 END
 
@@ -112,6 +229,8 @@ Expected final amount:
 
 Actual final amount:
 50
+
+The two pseudocode specifications agree on every step except one. Step 8 of the actual implementation replaces the subtotal with the discount amount (step 6 of the intended implementation computes the same number, but step 7 of the intended implementation subtracts it instead of keeping it). That single difference is the planted bug.
 
 ## Bug I Identified
 
